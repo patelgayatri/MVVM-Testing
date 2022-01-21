@@ -22,7 +22,7 @@ class PlaylistAdapter(
         val item = values[position]
         holder.name.text = item.name
         holder.category.text = item.category
-        holder.image.setImageResource(item.image)
+        holder.image.setImageResource(R.mipmap.ic_launcher)
     }
 
     override fun getItemCount(): Int = values.size

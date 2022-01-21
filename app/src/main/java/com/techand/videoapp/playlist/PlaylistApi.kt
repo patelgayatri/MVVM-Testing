@@ -1,9 +1,10 @@
 package com.techand.videoapp.playlist
 
+import retrofit2.http.GET
+
 interface PlaylistApi {
 
-    suspend fun fetchPlayList(): List<Playlist> {
-        return listOf()
-    }
+    @GET("playlists")
+    suspend fun fetchPlayList(): List<Playlist>
 
 }

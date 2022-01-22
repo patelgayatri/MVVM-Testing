@@ -1,13 +1,21 @@
 package com.techand.videoapp.playlist
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
+import kotlinx.coroutines.flow.onEach
 
 class PlayListViewModel(private val repository: PlayListRepository) : ViewModel() {
 
-    val playlists = liveData<Result<List<Playlist>>>{
-        emitSource(repository.getPlaylist().asLiveData())
+    val loader = MutableLiveData<Boolean>()
+
+    val playlists = liveData<Result<List<Playlist>>> {
+        loader.postValue(true)
+        emitSource(repository.getPlaylist()
+            .onEach {
+                loader.postValue(false)
+            }.asLiveData())
     }
 
 

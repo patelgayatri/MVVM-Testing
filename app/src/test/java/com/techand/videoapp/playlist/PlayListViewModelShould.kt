@@ -8,10 +8,11 @@ import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runBlockingTest
-import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.verify
+import petros.efthymiou.groovy.utils.captureValues
 import petros.efthymiou.groovy.utils.getValueForTest
+
 @ExperimentalCoroutinesApi
 class PlayListViewModelShould : BaseUnitTest() {
 
@@ -21,36 +22,64 @@ class PlayListViewModelShould : BaseUnitTest() {
     private var expected = Result.success(playlists)
     private var exception = RuntimeException("Error")
 
-    @Before
-    fun setUp() {
-        runBlockingTest {
-            whenever(repository.getPlaylist()).thenReturn(flow {
-                emit(expected)
-            })
-            viewmodel = PlayListViewModel(repository)
-        }
-    }
 
-    @Test
-    fun getDataFromRepository() = runBlockingTest{
-        viewmodel.playlists.getValueForTest()
-        verify(repository, times(1)).getPlaylist()
+    private suspend fun mockSuccessCase()= runBlockingTest {
+        whenever(repository.getPlaylist()).thenReturn(
+            flow {
+                 emit(expected)
+         })
+        viewmodel = PlayListViewModel(repository)
     }
-
-    @Test
-    fun emitPlaylistsFromRepository() = runBlockingTest{
-        assertEquals(expected, viewmodel.playlists.getValueForTest())
-    }
-    @Test
-    fun emitErrorWhenReceiveError(){
+    private fun mockFailureCase() {
         runBlockingTest {
             whenever(repository.getPlaylist()).thenReturn(flow {
                 emit(Result.failure<List<Playlist>>(exception))
             })
             viewmodel = PlayListViewModel(repository)
         }
-        assertEquals(exception,viewmodel.playlists.getValueForTest()!!.exceptionOrNull())
+    }
+    @Test
+    fun getDataFromRepository() = runBlockingTest {
+        mockSuccessCase()
+        viewmodel.playlists.getValueForTest()
+        verify(repository, times(1)).getPlaylist()
     }
 
+    @Test
+    fun emitPlaylistsFromRepository() = runBlockingTest {
+        mockSuccessCase()
+        assertEquals(expected, viewmodel.playlists.getValueForTest())
+    }
 
+    @Test
+    fun emitErrorWhenReceiveError() {
+        mockFailureCase()
+        assertEquals(exception, viewmodel.playlists.getValueForTest()!!.exceptionOrNull())
+    }
+
+    @Test
+    fun showSpinnerWhileLoading() = runBlockingTest {
+        mockSuccessCase()
+        viewmodel.loader.captureValues {
+            viewmodel.playlists.getValueForTest()
+            assertEquals(true, values[0])
+        }
+    }
+
+    @Test
+    fun hideLoadingAfterListLoaded()= runBlockingTest {
+        mockSuccessCase()
+        viewmodel.loader.captureValues {
+            viewmodel.playlists.getValueForTest()
+            assertEquals(false,values.last())
+        }
+    }
+    @Test
+    fun hideLoadingAfterFailure()= runBlockingTest {
+        mockFailureCase()
+        viewmodel.loader.captureValues {
+            viewmodel.playlists.getValueForTest()
+            assertEquals(false,values.last())
+        }
+    }
 }

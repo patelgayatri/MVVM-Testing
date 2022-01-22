@@ -3,11 +3,12 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
+    id 'kotlin-android-extensions'
 }
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "30.0.3"
+    buildToolsVersion "30.0.2"
 
     defaultConfig {
         applicationId "com.techand.videoapp"
@@ -57,10 +58,9 @@ dependencies {
 
     //dagger-hilt
     implementation "com.google.dagger:hilt-android:2.40.5"
-    implementation 'androidx.mediarouter:mediarouter:1.2.5'
     kapt "com.google.dagger:hilt-compiler:2.40.5"
 
-    testImplementation 'junit:junit:4.13.1'
+    testImplementation 'junit:junit:4.13'
     testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0'
     testImplementation 'org.mockito:mockito-inline:2.21.0'
     testImplementation 'androidx.arch.core:core-testing:2.1.0'

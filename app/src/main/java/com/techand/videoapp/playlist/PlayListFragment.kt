@@ -11,14 +11,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.techand.videoapp.R
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.fragment_play_list.*
+import kotlinx.android.synthetic.main.fragment_play_list.view.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class PlayListFragment : Fragment() {
 
     private lateinit var viewModel: PlayListViewModel
+
     @Inject
-     lateinit var viewModelFactory: PlayListViewModelFactory
+    lateinit var viewModelFactory: PlayListViewModelFactory
 
 
     override fun onCreateView(
@@ -27,9 +30,17 @@ class PlayListFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_play_list, container, false)
         setViewModel()
+
+        viewModel.loader.observe(this as LifecycleOwner, { loading ->
+            when (loading) {
+                true -> loader.visibility = View.VISIBLE
+                else -> loader.visibility = View.GONE
+            }
+        })
+
         viewModel.playlists.observe(this as LifecycleOwner, { playlist ->
             if (playlist.getOrNull() != null)
-                setRv(view, playlist.getOrNull()!!)
+                setRv(view.playlist_list, playlist.getOrNull()!!)
             else {
                 TODO()
             }
@@ -49,7 +60,7 @@ class PlayListFragment : Fragment() {
     }
 
     private fun setViewModel() {
-         viewModel = ViewModelProvider(this, viewModelFactory).get(PlayListViewModel::class.java)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(PlayListViewModel::class.java)
     }
 
     companion object {

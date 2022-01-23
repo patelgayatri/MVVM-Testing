@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class PlayListService @Inject constructor(val api: PlaylistApi) {
-    suspend fun fetchPlayList(): Flow<Result<List<Playlist>>> {
+    suspend fun fetchPlayList(): Flow<Result<List<PlaylistRaw>>> {
         return flow {
             emit(Result.success(api.fetchPlayList()))
         }.catch {

@@ -74,6 +74,27 @@ class PlayListFeature {
         assertNotDisplayed(R.id.loader)
     }
 
+    @Test
+    fun displaysRockImageForRockListItem(){
+        Thread.sleep(4000)
+        onView(
+            allOf(
+                withId(R.id.playlist_image),
+                isDescendantOfA(nthChildOf(withId(R.id.playlist_list), 0))
+            )
+        )
+            .check(matches(withDrawable(R.drawable.ic_launcher_background)))
+            .check(matches(isDisplayed()))
+        onView(
+            allOf(
+                withId(R.id.playlist_image),
+                isDescendantOfA(nthChildOf(withId(R.id.playlist_list), 3))
+            )
+        )
+            .check(matches(withDrawable(R.drawable.ic_launcher_background)))
+            .check(matches(isDisplayed()))
+    }
+
     fun nthChildOf(parentMatcher: Matcher<View>, childPosition: Int): Matcher<View> {
         return object : TypeSafeMatcher<View>() {
             override fun describeTo(description: Description) {

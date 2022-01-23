@@ -16,9 +16,11 @@ import org.junit.Test
 class PlaylistRepositoryShould : BaseUnitTest() {
 
     private val service: PlayListService = mock()
-    private val repository = PlayListRepository(service)
+    private val mapper: PlaylistMapper = mock()
+    private val repository = PlayListRepository(service, mapper)
     private val playlists = mock<List<Playlist>>()
-    private val exception =RuntimeException("Error")
+    private val playlistRaw = mock<List<PlaylistRaw>>()
+    private val exception = RuntimeException("Error")
 
 
     @Test
@@ -29,21 +31,42 @@ class PlaylistRepositoryShould : BaseUnitTest() {
 
 
     @Test
-    fun emitPlaylistFromService() = runBlockingTest {
-        whenever(service.fetchPlayList()).thenReturn(
-            flow {
-                emit(Result.success(playlists))
-            })
+    fun emitMapperPlaylistFromService() = runBlockingTest {
+        val repository = mockSuccessfulCase()
         assertEquals(playlists, repository.getPlaylist().first().getOrNull())
     }
 
+
     @Test
-    fun emitErrorFromService()= runBlockingTest {
+    fun emitErrorFromService() = runBlockingTest {
+        val repository = mockFailureCase()
+        assertEquals(exception, repository.getPlaylist().first().exceptionOrNull())
+    }
+
+
+    @Test
+    fun delegateBusinessLogicToMapper() = runBlockingTest {
+        val repository = mockSuccessfulCase()
+        repository.getPlaylist().first()
+        verify(mapper, times(1)).invoke(playlistRaw)
+    }
+
+    private suspend fun mockSuccessfulCase(): PlayListRepository {
         whenever(service.fetchPlayList()).thenReturn(
             flow {
-                emit(Result.failure<List<Playlist>>(exception))
+                emit(Result.success(playlistRaw))
+            })
+        whenever(mapper.invoke(playlistRaw)).thenReturn(playlists)
+        return PlayListRepository(service, mapper)
+    }
+
+    private suspend fun mockFailureCase(): PlayListRepository {
+        whenever(service.fetchPlayList()).thenReturn(
+            flow {
+                emit(Result.failure<List<PlaylistRaw>>(exception))
             }
         )
-        assertEquals(exception,repository.getPlaylist().first().exceptionOrNull())
+        whenever(mapper.invoke(playlistRaw)).thenReturn(playlists)
+        return PlayListRepository(service, mapper)
     }
 }

@@ -56,7 +56,7 @@ class PlayListFeature {
         onView(
             allOf(
                 withId(R.id.playlist_image),
-                isDescendantOfA(nthChildOf(withId(R.id.playlist_list), 0))
+                isDescendantOfA(nthChildOf(withId(R.id.playlist_list), 1))
             )
         )
             .check(matches(withDrawable(R.mipmap.ic_launcher)))

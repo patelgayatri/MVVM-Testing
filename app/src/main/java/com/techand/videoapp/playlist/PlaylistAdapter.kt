@@ -4,12 +4,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.techand.videoapp.R
 
 class PlaylistAdapter(
-    private val values: List<Playlist>
+    private val values: List<Playlist>,
+    private val listener: (String) -> Unit
 ) : RecyclerView.Adapter<PlaylistAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -23,6 +25,7 @@ class PlaylistAdapter(
         holder.name.text = item.name
         holder.category.text = item.category
         holder.image.setImageResource(item.image)
+        holder.root.setOnClickListener { listener(item.id) }
     }
 
     override fun getItemCount(): Int = values.size
@@ -31,6 +34,7 @@ class PlaylistAdapter(
         val name: TextView = view.findViewById(R.id.playlist_name)
         val category: TextView = view.findViewById(R.id.playlist_category)
         val image: ImageView = view.findViewById(R.id.playlist_image)
+        val root: LinearLayout= view.findViewById(R.id.item_root)
 
     }
 }

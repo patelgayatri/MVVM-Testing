@@ -1,27 +1,23 @@
 package com.techand.videoapp
 
-import android.view.View
-import android.view.ViewGroup
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import com.schibsted.spain.barista.assertion.BaristaRecyclerViewAssertions.assertRecyclerViewItemCount
 import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
 import com.schibsted.spain.barista.internal.matcher.DrawableMatcher.Companion.withDrawable
-import org.hamcrest.Description
-import org.hamcrest.Matcher
+import com.techand.videoapp.di.idlingResource
 import org.hamcrest.Matchers.allOf
-import org.hamcrest.TypeSafeMatcher
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 
 
-@RunWith(AndroidJUnit4::class)
-class PlayListFeature {
+
+class PlayListFeature: BaseUiTest() {
 
     val activityTestRule = ActivityTestRule(MainActivity::class.java)
         @Rule get
@@ -34,7 +30,6 @@ class PlayListFeature {
     @Test
     fun displayListOfPlayList() {
 
-        Thread.sleep(4000)
         assertRecyclerViewItemCount(R.id.playlist_list, 10)
 
         onView(
@@ -65,18 +60,20 @@ class PlayListFeature {
 
     @Test
     fun displaysLoaderWhileFetchingThePlaylist() {
+
+        IdlingRegistry.getInstance().unregister(idlingResource)
         assertDisplayed(R.id.loader)
     }
 
     @Test
     fun hideLoader() {
-        Thread.sleep(4000)
+
         assertNotDisplayed(R.id.loader)
     }
 
     @Test
     fun displaysRockImageForRockListItem(){
-        Thread.sleep(4000)
+
         onView(
             allOf(
                 withId(R.id.playlist_image),
@@ -95,21 +92,11 @@ class PlayListFeature {
             .check(matches(isDisplayed()))
     }
 
-    fun nthChildOf(parentMatcher: Matcher<View>, childPosition: Int): Matcher<View> {
-        return object : TypeSafeMatcher<View>() {
-            override fun describeTo(description: Description) {
-                description.appendText("position $childPosition of parent ")
-                parentMatcher.describeTo(description)
-            }
-
-            public override fun matchesSafely(view: View): Boolean {
-                if (view.parent !is ViewGroup) return false
-                val parent = view.parent as ViewGroup
-
-                return (parentMatcher.matches(parent)
-                        && parent.childCount > childPosition
-                        && parent.getChildAt(childPosition) == view)
-            }
-        }
+    @Test
+    fun navigateToDetailScreen(){
+        onView(allOf(withId(R.id.playlist_image), isDescendantOfA(nthChildOf(withId(R.id.playlist_list), 0))))
+            .perform(click())
+        assertDisplayed(R.id.playlist_detail_root)
     }
+
 }

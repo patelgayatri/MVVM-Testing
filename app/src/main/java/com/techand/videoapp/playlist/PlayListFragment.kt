@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.techand.videoapp.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_play_list.*
@@ -43,7 +44,7 @@ class PlayListFragment : Fragment() {
             if (playlist.getOrNull() != null)
                 setRv(view.playlist_list, playlist.getOrNull()!!)
             else {
-                TODO()
+                Snackbar.make(view,playlist.exceptionOrNull()?.message ?: "Error",Snackbar.LENGTH_LONG).show()
             }
 
         })

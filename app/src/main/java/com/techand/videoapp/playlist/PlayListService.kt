@@ -10,7 +10,7 @@ class PlayListService @Inject constructor(val api: PlaylistApi) {
         return flow {
             emit(Result.success(api.fetchPlayList()))
         }.catch {
-            emit(Result.failure(RuntimeException("Error")))
+            emit(Result.failure(RuntimeException(it.message ?: "Error")))
         }
     }
 
